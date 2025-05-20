@@ -119,7 +119,7 @@ export default function DiseaseInfoPage() {
           Thông tin về bệnh & giải thích triệu chứng
         </h1>
         <div className="mb-2">
-            <b>Bệnh:</b> {DISEASE_TRANSLATION[disease] || disease}
+            <b>Bệnh:</b> {DISEASE_TRANSLATION[Array.isArray(disease) ? disease[0] : disease] || (Array.isArray(disease) ? disease[0] : disease)}
         </div>
         <div className="mb-2">
             <b>Triệu chứng:</b>{" "}
