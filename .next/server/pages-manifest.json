@@ -3,6 +3,8 @@
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
   "/": "pages/index.js",
-  "/doctordashboard": "pages/doctordashboard.js",
-  "/symptominput": "pages/symptominput.js"
+  "/api/predict": "pages/api/predict.js",
+  "/diseaseinfo/[disease]": "pages/diseaseinfo/[disease].js",
+  "/api/diseaseinfo": "pages/api/diseaseinfo.js",
+  "/doctordashboard": "pages/doctordashboard.js"
 }

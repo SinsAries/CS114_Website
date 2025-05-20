@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react';
 import { 
   Activity, 
@@ -20,6 +21,8 @@ import {
 } from 'lucide-react';
 
 export default function DoctorDashboardPage() {
+  const router = useRouter();
+
   // State cho dữ liệu bệnh nhân
   const [patients, setPatients] = useState([]);
   const [filteredPatients, setFilteredPatients] = useState([]);
@@ -118,6 +121,30 @@ export default function DoctorDashboardPage() {
     "hiv": "HIV/AIDS",
     "highCholesterol": "Cholesterol cao",
     "hypertension": "Tăng huyết áp"
+  };
+
+  // Thêm state để lưu thông tin giải thích
+  const [loadingInfo, setLoadingInfo] = useState(false);
+  const [infoError, setInfoError] = useState("");
+
+  // Hàm gọi API
+  const fetchDiseaseInfo = async (disease, symptoms) => {
+    setLoadingInfo(true);
+    setDiseaseInfo("");
+    setInfoError("");
+    try {
+      const res = await fetch("/api/diseaseinfo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ disease, symptoms })
+      });
+      const data = await res.json();
+      if (data.explanation) setDiseaseInfo(data.explanation);
+      else setInfoError(data.error || "Không lấy được thông tin.");
+    } catch (err) {
+      setInfoError("Lỗi kết nối API");
+    }
+    setLoadingInfo(false);
   };
 
 
@@ -1030,8 +1057,22 @@ export default function DoctorDashboardPage() {
                           <tr key={index} className="border-b last:border-b-0">
                             <td className="py-1 px-2 font-mono">{prediction.model}</td>
                             <td className="py-1 px-2">
-                              {prediction.error ? <span className="text-red-600">{prediction.error}</span> : <span>{DISEASE_TRANSLATION[prediction.disease] || prediction.disease}</span>}
-                            </td>
+                              {prediction.error ? (
+                                <span className="text-red-600">{prediction.error}</span>
+                              ) : (
+                                <button
+                                  className="text-blue-700 underline hover:text-blue-900"
+                                  onClick={() => {
+                                    // Chuyển sang mở tab mới với URL phù hợp
+                                    const url = `/diseaseinfo/${encodeURIComponent(prediction.disease)}?symptoms=${encodeURIComponent(JSON.stringify(predictingPatient.symptoms))}`;
+                                    window.open(url, "_blank"); // Mở tab mới
+                                  }}
+                                  type="button"
+                                >
+                                  {DISEASE_TRANSLATION[prediction.disease] || prediction.disease}
+                                </button>
+                              )}
+                            </td> 
                             {/* <td className="py-1 px-2">{Math.round(prediction.probability * 100)}%</td> nếu có */}
                             <td className="py-1 px-2">
                               {prediction.error ? (
@@ -1091,6 +1132,32 @@ export default function DoctorDashboardPage() {
         </div>
     </div>
     </footer>
-    </main>
+
+    {/* Modal giải thích bệnh và triệu chứng */}
+    {(diseaseInfo || loadingInfo || infoError) && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+        <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 relative">
+          <button
+            className="absolute top-3 right-3 text-gray-400 hover:text-gray-700"
+            onClick={() => {
+              setDiseaseInfo("");
+              setInfoError("");
+              setLoadingInfo(false);
+            }}
+          >
+            <X className="h-6 w-6" />
+          </button>
+          <h3 className="text-xl font-semibold mb-2">Thông tin bệnh & giải thích triệu chứng</h3>
+          {loadingInfo && <div>Đang tải thông tin...</div>}
+          {infoError && <div className="text-red-600">{infoError}</div>}
+          {diseaseInfo && (
+            <div className="whitespace-pre-line text-gray-800 mt-2" style={{maxHeight: 350, overflowY: "auto"}}>
+              {diseaseInfo}
+            </div>
+          )}
+        </div>
+      </div>
+    )}
+    </main>   
   );
 }

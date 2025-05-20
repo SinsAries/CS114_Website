@@ -22,15 +22,15 @@
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
     ],
+    "/diseaseinfo/[disease]": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/diseaseinfo/[disease].js"
+    ],
     "/doctordashboard": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
       "static/chunks/pages/doctordashboard.js"
-    ],
-    "/symptominput": [
-      "static/chunks/webpack.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/symptominput.js"
     ]
   },
   "ampFirstPages": []
